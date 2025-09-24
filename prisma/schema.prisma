@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  User
+  Admin
+  Moderator
+}
+
+enum Priority {
+  High
+  Medium
+  Low
+}
+
+enum Status {
+  Todo
+  InProgress
+  Done
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  avatar    String?
+  role      Role     @default(User)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks Task[]
+  invitationsSent Invitation[]
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  date        DateTime  @default(now())
+  priority    Priority
+  description String
+  status      Status    @default(Todo)
+  image       String?
+  startDate   DateTime?
+  endDate     DateTime?
+  allDay      Boolean   @default(false)
+
+  userId  Int
+  user    User @relation(fields: [userId], references: [id])
+
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  description String
+  priority Priority
+
+  tasks Task[]
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+model Invitation {
+  id         Int               @id @default(autoincrement())
+  email      String
+  token      String            @unique
+  status     InvitationStatus  @default(PENDING)
+  invitedBy  User              @relation(fields: [invitedById], references: [id])
+  invitedById Int
+  createdAt  DateTime          @default(now())
+  expiresAt  DateTime
+}
