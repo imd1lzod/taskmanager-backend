@@ -35,7 +35,7 @@ export class InvitationService {
     });
 
     // Send email with accept link
-    const baseUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const baseUrl = process.env.CLIENT_URL || 'http://13.62.99.86:5173';
     const inviteLink = `${baseUrl}/invite/${token}`;
     try {
       await this.mail.sendInvitationEmail(dto.email, inviteLink);
